@@ -7,31 +7,47 @@ const Sidebar = () => {
             <div>
                 <h2 className="text-2xl font-bold mb-8 text-green-600">Mi Tienda</h2>
                 <nav className="flex flex-col space-y-4 text-gray-600">
-                    <NavLink to="/dashboard" className={({ isActive }) => 
-                        `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
-                            isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
-                        }`}>
+                    <NavLink
+                        to="/dashboard"
+                        className={({ isActive }) =>
+                            `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
+                                isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
+                            }`
+                        }
+                    >
                         <FaTachometerAlt />
                         <span>Dashboard</span>
                     </NavLink>
-                    <NavLink to="/dashboard/graficas" className={({ isActive }) => 
-                        `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
-                            isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
-                        }`}>
+                    <NavLink
+                        to="/dashboard/graficas"
+                        className={({ isActive }) =>
+                            `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
+                                isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
+                            }`
+                        }
+                    >
                         <FaChartLine />
                         <span>Gráficas</span>
                     </NavLink>
-                    <NavLink to="/dashboard/clientes" className={({ isActive }) => 
-                        `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
-                            isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
-                        }`}>
+                    <NavLink
+                        to="/dashboard/clientes"
+                        className={({ isActive }) =>
+                            `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
+                                isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
+                            }`
+                        }
+                    >
                         <FaUsers />
                         <span>Clientes</span>
                     </NavLink>
-                    <NavLink to="/dashboard/productos" className={({ isActive }) => 
-                        `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
-                            isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
-                        }`}>
+                    <NavLink
+                        to="/dashboard/productos"
+                        className={({ isActive }) =>
+                            `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
+                                isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
+                            }`
+                        }
+                    >
                         <FaBoxOpen />
                         <span>Productos</span>
                     </NavLink>
