@@ -15,18 +15,15 @@ function App() {
       <div className="App flex">
         
         <div className="flex-1 p-4">
-          <Header />
-
+          
           {/* Configuración de las rutas */}
           <Routes>
-            {/* Ruta para el Dashboard que incluye todos los componentes */}
-            <Route path="/Dashboard" element={<Dashboard token={token} />} />
+                    {/* Ruta para el login */}
+                    <Route path="/" element={<Login onLoginSuccess={setToken} />} />
 
-            {/* Ruta para el Login */}
-            <Route path="/" element={<Login onLoginSuccess={setToken} />} />
-
-            
-          </Routes>
+                    {/* Ruta para el Dashboard, que contiene las rutas secundarias */}
+                    <Route path="/dashboard/*" element={<Dashboard token={token} />} />
+                </Routes>
         </div>
       </div>
     </Router>
