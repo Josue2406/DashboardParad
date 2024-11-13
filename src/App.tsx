@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './sidebar';
 import Login from './Login';
 import Dashboard from './Dashboard';
-import DynamicChart from './DynamicChart';
 
 function App() {
   // Estado para almacenar el token de inicio de sesión
@@ -13,7 +12,7 @@ function App() {
   return (
     <Router>
       <div className="App flex">
-        
+        <Sidebar />
         <div className="flex-1 p-4">
           <Header />
 
@@ -24,8 +23,6 @@ function App() {
 
             {/* Ruta para el Login */}
             <Route path="/" element={<Login onLoginSuccess={setToken} />} />
-
-            
           </Routes>
         </div>
       </div>
