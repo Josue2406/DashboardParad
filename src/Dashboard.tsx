@@ -5,6 +5,7 @@ import DynamicChart from './DynamicChart';
 import SummaryCards from './summaryCards';
 import Sidebar from './sidebar';
 import Header from './Header';
+import EventViewer from './EventView';
 
 interface DashboardProps {
     token: string | null;
@@ -39,6 +40,9 @@ const Dashboard: React.FC<DashboardProps> = ({ token }) => {
                         
                         {/* Ruta para mostrar solo productos */}
                         <Route path="productos" element={<div>Productos agregados</div>} />
+
+                        {/* Ruta para mostrar solo views */}
+                        <Route path="event-viewer" element={<EventViewer />} />
                     </Routes>
                 </div>
             </div>
