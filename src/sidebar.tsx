@@ -48,9 +48,22 @@ const Sidebar = () => {
                             }`
                         }
                     >
+
                         <FaBoxOpen />
                         <span>Productos</span>
                     </NavLink>
+                    <NavLink
+                        to="/event-viewer"
+                        className={({ isActive }) =>
+                            `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
+                                isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
+                            }`
+                        }
+                    >
+                        <FaTachometerAlt />
+                        <span>Eventos</span>
+                    </NavLink>
+
                 </nav>
             </div>
             <button className="bg-red-100 py-2 rounded-lg w-full hover:bg-red-200 text-red-600 font-semibold">
