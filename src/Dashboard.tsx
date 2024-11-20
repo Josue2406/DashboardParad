@@ -1,11 +1,12 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Charts from './Charts';
-import DynamicChart from './DynamicChart';
-import SummaryCards from './summaryCards';
+// import DynamicChart from './DynamicChart';
+// import SummaryCards from './summaryCards';
 import Sidebar from './sidebar';
 import Header from './Header';
 import EventViewer from './EventView';
+import SummaryCards from './summaryCards';
 
 interface DashboardProps {
     token: string | null;
@@ -29,20 +30,21 @@ const Dashboard: React.FC<DashboardProps> = ({ token }) => {
                 {/* Contenido desplazable debajo del Header */}
                 <div className="p-4 overflow-y-auto h-[calc(100vh-80px)] mt-28">
                     <Routes>
-                        {/* Ruta principal que muestra todas las secciones */}
-                        <Route path="/" element={<><SummaryCards /><Charts /></>} />
+                        <Route path="/" element={<><SummaryCards/><Charts /></>} />
                         
                         {/* Ruta para mostrar solo las gráficas */}
                         <Route path="graficas" element={<Charts />} />
                         
-                        {/* Ruta para mostrar solo las tarjetas de resumen de clientes */}
-                        <Route path="clientes" element={<SummaryCards />} />
+                        {/* Ruta para mostrar solo las tarjetas de resumen de clientes
+                        <Route path="clientes" element={<SummaryCards />} /> */}
                         
                         {/* Ruta para mostrar solo productos */}
                         <Route path="productos" element={<div>Productos agregados</div>} />
 
                         {/* Ruta para mostrar solo views */}
                         <Route path="event-viewer" element={<EventViewer />} />
+
+
                     </Routes>
                 </div>
             </div>

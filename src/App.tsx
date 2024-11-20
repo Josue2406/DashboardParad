@@ -21,6 +21,7 @@ function App() {
 
           {/* Ruta para EventViewer */}
           <Route path="/event-viewer" element={<EventViewer />} />
+
         </Routes>
       </div>
     </Router>

@@ -27,7 +27,7 @@ const Sidebar = () => {
                         <FaTachometerAlt />
                         <span>Dashboard</span>
                     </NavLink>
-                    <NavLink
+                    {/* <NavLink
                         to="/dashboard/graficas"
                         className={({ isActive }) =>
                             `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
@@ -60,7 +60,7 @@ const Sidebar = () => {
 
                         <FaBoxOpen />
                         <span>Productos</span>
-                    </NavLink>
+                    </NavLink> */}
                     <NavLink
                         to="/event-viewer"
                         className={({ isActive }) =>

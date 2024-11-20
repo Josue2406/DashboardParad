@@ -1,182 +1,127 @@
-/*
-import { useEffect, useState } from "react";
-import axios from "axios";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-} from "chart.js";
-import { Bar, Pie } from "react-chartjs-2";
-import * as signalR from "@microsoft/signalr";
+// import {
+//   Chart as ChartJS,
+//   CategoryScale,
+//   LinearScale,
+//   BarElement,
+//   Title,
+//   Tooltip,
+//   Legend,
+//   ArcElement,
+// } from "chart.js";
+// import { Bar, Pie } from "react-chartjs-2";
+// import * as signalR from "@microsoft/signalr";
+// import { useEffect, useState } from "react";
 
-// Registrar componentes de Chart.js
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
+// ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
-interface Product {
-  Id: number;
-  ProductId: number;
-  Name: string;
-  Price: number;
-}
+// const Charts = () => {
+//   const [ventasMensuales, setVentasMensuales] = useState(Array(12).fill(0)); // Ventas por mes
+//   const [ventasPorProducto, setVentasPorProducto] = useState<{ [key: string]: number }>({}); // Ventas por producto
 
-interface EventData {
-  PurchaseId: number;
-  CustomerId: number;
-  Products: Product[];
-  Date: string;
-}
+//   // Conexión a SignalR
+//   useEffect(() => {
+//     const connection = new signalR.HubConnectionBuilder()
+//       .withUrl("https://localhost:7062/statisticsHub", {
+//         skipNegotiation: true,
+//         transport: signalR.HttpTransportType.WebSockets,
+//       })
+//       .withAutomaticReconnect()
+//       .configureLogging(signalR.LogLevel.Information)
+//       .build();
+  
+//     let isMounted = true; // Variable para controlar el desmontaje del componente
+  
+//     connection
+//       .start()
+//       .then(() => {
+//         if (isMounted) {
+//           console.log("Conectado a SignalR");
+//           connection.on("ReceiveStatistics", (statistics: any) => {
+//             console.log("Datos recibidos:", statistics);
+//             actualizarDatosGraficas(statistics);
+//           });
+//         }
+//       })
+//       .catch((error) => {
+//         console.error("Error al conectar con SignalR:", error);
+//       });
+  
+//     return () => {
+//       isMounted = false; // Marcar como desmontado antes de detener la conexión
+//       connection.stop().catch((error) => console.error("Error al detener la conexión:", error));
+//     };
+//   }, []);
+  
 
-const Charts = () => {
-  const [ventasMensuales, setVentasMensuales] = useState(Array(12).fill(0)); // Datos mensuales inicializados en 0
-  const [ventasPorCategoria, setVentasPorCategoria] = useState<{ [key: string]: number }>({});
-  const [cargaInicialCompleta, setCargaInicialCompleta] = useState(false); // Control de carga inicial
+//   const actualizarDatosGraficas = (statistics: any) => {
+//     if (statistics.purchasesByMonth) {
+//       actualizarVentasMensuales(statistics.purchasesByMonth);
+//       actualizarVentasPorProducto(statistics.purchasesByMonth);
+//     }
+//   };
 
-  // Cargar eventos antiguos al montar el componente
-  useEffect(() => {
-    const fetchOldEvents = async () => {
-      try {
-        const response = await axios.get<EventData[]>("https://localhost:7062/api/events/old");
-        const oldEvents = response.data;
+//   const actualizarVentasMensuales = (purchasesByMonth: any[]) => {
+//     const nuevasVentasMensuales = Array(12).fill(0);
 
-        oldEvents.forEach((event) => {
-          console.log("Procesando evento antiguo:", event);
-          actualizarDatosGraficas(event);
-        });
+//     purchasesByMonth.forEach(({ month, totalAmount }: any) => {
+//       const [year, monthString] = month.split("-");
+//       const mesIndex = parseInt(monthString, 10) - 1; // Convertir el mes a índice (0-11)
+//       nuevasVentasMensuales[mesIndex] = totalAmount;
+//     });
 
-        setCargaInicialCompleta(true); // Habilitar la recepción de eventos en tiempo real
-      } catch (error) {
-        console.error("Error al cargar eventos antiguos:", error);
-      }
-    };
+//     setVentasMensuales(nuevasVentasMensuales);
+//   };
 
-    fetchOldEvents();
-  }, []);
+//   const actualizarVentasPorProducto = (purchasesByMonth: any[]) => {
+//     const nuevasVentasPorProducto: { [key: string]: number } = {};
 
-  // Conectar a SignalR para recibir eventos en tiempo real
-  useEffect(() => {
-    if (!cargaInicialCompleta) return; // Evitar conexión hasta que termine la carga inicial
+//     purchasesByMonth.forEach(({ products }: any) => {
+//       products.forEach(({ productId, name, price }: any) => {
+//         nuevasVentasPorProducto[name] = (nuevasVentasPorProducto[name] || 0) + price;
+//       });
+//     });
 
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7062/eventHub", {
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets,
-      })
-      .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Information)
-      .build();
+//     setVentasPorProducto(nuevasVentasPorProducto);
+//   };
 
-    connection
-      .start()
-      .then(() => {
-        console.log("Conectado a SignalR");
-        connection.on("ReceiveEvent", (eventData: { data: string; isNew: boolean }) => {
-          console.log("Evento en tiempo real recibido:", eventData);
-          actualizarDatosGraficas(eventData);
-        });
-      })
-      .catch((error) => console.error("Error al conectar con SignalR:", error));
+//   const barData = {
+//     labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+//     datasets: [
+//       {
+//         label: "Total Ventas por Mes",
+//         data: ventasMensuales,
+//         backgroundColor: "#84cc16",
+//       },
+//     ],
+//   };
 
-    return () => {
-      connection.stop();
-    };
-  }, [cargaInicialCompleta]);
+//   const pieData = {
+//     labels: Object.keys(ventasPorProducto),
+//     datasets: [
+//       {
+//         data: Object.values(ventasPorProducto),
+//         backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#FF9F40", "#4BC0C0", "#9966FF", "#FF9F80"],
+//       },
+//     ],
+//   };
 
-  const actualizarDatosGraficas = (eventData: EventData | { data: string; isNew: boolean }) => {
-    let parsedData: EventData;
+//   return (
+//     <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+//       <div className="bg-white p-4 rounded-lg shadow-md w-full h-96">
+//         <h2 className="text-lg font-semibold mb-4">Resumen de Ventas (Total por Mes)</h2>
+//         <Bar data={barData} options={{ maintainAspectRatio: false }} />
+//       </div>
+//       <div className="bg-white p-4 rounded-lg shadow-md w-full h-[400px]">
+//         <h2 className="text-lg font-semibold mb-4">Ventas por Producto</h2>
+//         <Pie data={pieData} options={{ maintainAspectRatio: false }} />
+//       </div>
+//     </section>
+//   );
+// };
 
-    if ("data" in eventData) {
-      try {
-        parsedData = JSON.parse(eventData.data);
-      } catch (error) {
-        console.error("Error al parsear el evento:", error);
-        return;
-      }
-    } else {
-      parsedData = eventData;
-    }
+// export default Charts;
 
-    const { Products, Date: eventDate } = parsedData;
 
-    if (!Array.isArray(Products) || Products.length === 0) {
-      console.warn("El evento no contiene productos válidos:", parsedData);
-      return;
-    }
-
-    const mes = new Date(eventDate).getMonth();
-    const montoTotal = Products.reduce((total, product) => total + product.Price, 0);
-
-    setVentasMensuales((prevVentasMensuales) => {
-      const nuevasVentasMensuales = [...prevVentasMensuales];
-      nuevasVentasMensuales[mes] += montoTotal;
-      console.log("Ventas mensuales actualizadas:", nuevasVentasMensuales);
-      return nuevasVentasMensuales;
-    });
-
-    Products.forEach((product) => {
-      const categoria = product.Name;
-      setVentasPorCategoria((prevVentasPorCategoria) => {
-        const nuevasVentasPorCategoria = {
-          ...prevVentasPorCategoria,
-          [categoria]: (prevVentasPorCategoria[categoria] || 0) + product.Price,
-        };
-        console.log("Ventas por categoría actualizadas:", nuevasVentasPorCategoria);
-        return nuevasVentasPorCategoria;
-      });
-    });
-  };
-
-  const dynamicColors = (numColors: number) => {
-    return Array.from({ length: numColors }, () =>
-      `#${Math.floor(Math.random() * 16777215).toString(16)}`
-    );
-  };
-
-  const barData = {
-    labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
-    datasets: [
-      {
-        label: "Ventas",
-        data: ventasMensuales,
-        backgroundColor: "#84cc16",
-      },
-    ],
-  };
-
-  const pieData = {
-    labels: Object.keys(ventasPorCategoria),
-    datasets: [
-      {
-        data: Object.values(ventasPorCategoria),
-        backgroundColor: dynamicColors(Object.keys(ventasPorCategoria).length),
-      },
-    ],
-  };
-
-  if (!cargaInicialCompleta) {
-    return <div className="text-center mt-10">Cargando datos...</div>;
-  }
-
-  return (
-    <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-white p-4 rounded-lg shadow-md w-full h-96">
-        <h2 className="text-lg font-semibold mb-4">Resumen de Ventas</h2>
-        <Bar data={barData} options={{ maintainAspectRatio: false }} style={{ height: "200px" }} />
-      </div>
-      <div className="bg-white p-4 rounded-lg shadow-md w-full h-[400px]">
-        <h2 className="text-lg font-semibold mb-4">Ventas por Categoría</h2>
-        <Pie data={pieData} options={{ maintainAspectRatio: false }} style={{ height: "300px" }} />
-      </div>
-    </section>
-  );
-};
-
-export default Charts;
-*/
 import { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
@@ -193,26 +138,15 @@ import * as signalR from "@microsoft/signalr";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
-interface Product {
-  Id: number;
-  ProductId: number;
-  Name: string;
-  Price: number;
-}
-
-interface EventData {
-  data: string; // Evento en formato JSON (como string)
-  isNew: boolean; // Indica si el evento es nuevo o antiguo
-}
-
 const Charts = () => {
-  const [ventasMensuales, setVentasMensuales] = useState(Array(12).fill(0)); // Datos inicializados
-  const [ventasPorCategoria, setVentasPorCategoria] = useState<{ [key: string]: number }>({});
+  const [ventasMensuales, setVentasMensuales] = useState(Array(12).fill(0)); // Ventas por mes
+  const [ventasPorProducto, setVentasPorProducto] = useState<{ [key: string]: number }>({}); // Ventas por producto
 
-  // Conexión a SignalR
+  // Conexión a SignalR y Solicitud de Datos Iniciales
   useEffect(() => {
+    // Configuración de la conexión a SignalR
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7062/eventHub", {
+      .withUrl("https://localhost:7062/statisticsHub", {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets,
       })
@@ -220,69 +154,72 @@ const Charts = () => {
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
+    // Solicitar datos iniciales del backend
+    fetch("https://localhost:7062/api/events")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Datos iniciales recibidos:", data);
+        actualizarDatosGraficas(data);
+      })
+      .catch((error) => console.error("Error al cargar datos iniciales:", error));
+
+    // Conectar a SignalR
     connection
       .start()
       .then(() => {
         console.log("Conectado a SignalR");
 
-        // Recibir eventos antiguos y nuevos
-        connection.on("ReceiveEvent", (eventData: EventData | EventData[]) => {
-          if (Array.isArray(eventData)) {
-            // Procesar lotes de eventos antiguos
-            eventData.forEach((event) => actualizarDatosGraficas(event));
-          } else {
-            // Procesar evento individual (nuevo o antiguo)
-            actualizarDatosGraficas(eventData);
-          }
+        // Escuchar eventos en tiempo real
+        connection.on("ReceiveStatistics", (statistics: any) => {
+          console.log("Datos en tiempo real recibidos:", statistics);
+          actualizarDatosGraficas(statistics);
         });
       })
-      .catch((error) => console.error("Error al conectar con SignalR:", error));
+      .catch((error) => {
+        console.error("Error al conectar con SignalR:", error);
+      });
 
     return () => {
-      connection.stop();
+      connection.stop().catch((error) => console.error("Error al detener la conexión:", error));
     };
   }, []);
 
-  const actualizarDatosGraficas = (eventData: EventData) => {
-    console.log(`Procesando evento (${eventData.isNew ? "Nuevo" : "Antiguo"}):`, eventData);
-
-    try {
-      const parsedData = JSON.parse(eventData.data); // Parsear el JSON recibido
-      const { Products, Date: eventDate } = parsedData;
-
-      if (!Array.isArray(Products) || Products.length === 0) return;
-
-      const mes = new Date(eventDate).getMonth();
-      const montoTotal = Products.reduce((total: number, product: Product) => total + product.Price, 0);
-
-      // Actualizar datos de ventas mensuales
-      setVentasMensuales((prevVentasMensuales) => {
-        const nuevasVentasMensuales = [...prevVentasMensuales];
-        nuevasVentasMensuales[mes] += montoTotal;
-        return nuevasVentasMensuales;
-      });
-
-      // Actualizar datos de ventas por categoría
-      Products.forEach((product: Product) => {
-        const categoria = product.Name;
-        setVentasPorCategoria((prevVentasPorCategoria) => {
-          const nuevasVentasPorCategoria = {
-            ...prevVentasPorCategoria,
-            [categoria]: (prevVentasPorCategoria[categoria] || 0) + product.Price,
-          };
-          return nuevasVentasPorCategoria;
-        });
-      });
-    } catch (error) {
-      console.error("Error al procesar el evento:", error);
+  const actualizarDatosGraficas = (data: any) => {
+    if (data.purchasesByMonth) {
+      actualizarVentasMensuales(data.purchasesByMonth);
+      actualizarVentasPorProducto(data.purchasesByMonth);
     }
+  };
+
+  const actualizarVentasMensuales = (purchasesByMonth: any[]) => {
+    const nuevasVentasMensuales = Array(12).fill(0);
+
+    purchasesByMonth.forEach(({ month, totalAmount }: any) => {
+      const [year, monthString] = month.split("-");
+      const mesIndex = parseInt(monthString, 10) - 1; // Convertir el mes a índice (0-11)
+      nuevasVentasMensuales[mesIndex] = totalAmount;
+    });
+
+    setVentasMensuales(nuevasVentasMensuales);
+  };
+
+  const actualizarVentasPorProducto = (purchasesByMonth: any[]) => {
+    const nuevasVentasPorProducto: { [key: string]: number } = {};
+
+    purchasesByMonth.forEach(({ products }: any) => {
+      products.forEach(({ name, price }: any) => {
+        nuevasVentasPorProducto[name] = (nuevasVentasPorProducto[name] || 0) + price;
+      });
+    });
+
+    setVentasPorProducto(nuevasVentasPorProducto);
   };
 
   const barData = {
     labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
     datasets: [
       {
-        label: "Ventas",
+        label: "Total Ventas por Mes",
         data: ventasMensuales,
         backgroundColor: "#84cc16",
       },
@@ -290,11 +227,11 @@ const Charts = () => {
   };
 
   const pieData = {
-    labels: Object.keys(ventasPorCategoria),
+    labels: Object.keys(ventasPorProducto),
     datasets: [
       {
-        data: Object.values(ventasPorCategoria),
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#FF9F40"],
+        data: Object.values(ventasPorProducto),
+        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#FF9F40", "#4BC0C0", "#9966FF", "#FF9F80"],
       },
     ],
   };
@@ -302,11 +239,11 @@ const Charts = () => {
   return (
     <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="bg-white p-4 rounded-lg shadow-md w-full h-96">
-        <h2 className="text-lg font-semibold mb-4">Resumen de Ventas</h2>
+        <h2 className="text-lg font-semibold mb-4">Resumen de Ventas (Total por Mes)</h2>
         <Bar data={barData} options={{ maintainAspectRatio: false }} />
       </div>
       <div className="bg-white p-4 rounded-lg shadow-md w-full h-[400px]">
-        <h2 className="text-lg font-semibold mb-4">Ventas por Categoría</h2>
+        <h2 className="text-lg font-semibold mb-4">Ventas por Producto</h2>
         <Pie data={pieData} options={{ maintainAspectRatio: false }} />
       </div>
     </section>
