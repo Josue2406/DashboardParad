@@ -17,6 +17,7 @@
 // const Charts = () => {
 //   const [ventasMensuales, setVentasMensuales] = useState(Array(12).fill(0)); // Ventas por mes
 //   const [ventasPorProducto, setVentasPorProducto] = useState<{ [key: string]: number }>({}); // Ventas por producto
+//   const [mesesComparacion, setMesesComparacion] = useState<any[]>([]); // Datos para la nueva gráfica
 //   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // Año seleccionado
 //   const [allData, setAllData] = useState<any[]>([]); // Almacenar todos los datos
 
@@ -37,8 +38,8 @@
 //       .then((response) => response.json())
 //       .then((data) => {
 //         console.log("Datos iniciales recibidos:", data);
-//         setAllData(data.purchasesByMonth); // Guardar todos los datos
-//         actualizarDatosGraficas(data.purchasesByMonth, selectedYear);
+//         setAllData(data.salesStatisticsByYear || []); // Guardar los datos de comparación por año
+//         actualizarDatosGraficas(data.purchasesByMonth, data.salesStatisticsByYear, selectedYear);
 //       })
 //       .catch((error) => console.error("Error al cargar datos iniciales:", error));
 
@@ -51,8 +52,8 @@
 //         // Escuchar eventos en tiempo real
 //         connection.on("ReceiveStatistics", (statistics: any) => {
 //           console.log("Datos en tiempo real recibidos:", statistics);
-//           setAllData(statistics.purchasesByMonth); // Actualizar todos los datos
-//           actualizarDatosGraficas(statistics.purchasesByMonth, selectedYear);
+//           setAllData(statistics.salesStatisticsByYear || []); // Actualizar los datos de comparación por año
+//           actualizarDatosGraficas(statistics.purchasesByMonth, statistics.salesStatisticsByYear, selectedYear);
 //         });
 //       })
 //       .catch((error) => {
@@ -64,22 +65,22 @@
 //     };
 //   }, []);
 
-//   // Actualizar los datos filtrados por el año seleccionado
+//   // Actualizar los datos cuando se cambia el año
 //   useEffect(() => {
-//     actualizarDatosGraficas(allData, selectedYear);
+//     const filteredComparison = allData.filter((data: any) => data.year === selectedYear);
+//     setMesesComparacion(filteredComparison);
 //   }, [selectedYear, allData]);
 
-//   const actualizarDatosGraficas = (data: any[], year: number) => {
-//     if (!data) return;
+//   const actualizarDatosGraficas = (purchasesByMonth: any[], comparisonData: any[], year: number) => {
+//     if (!purchasesByMonth || !comparisonData) return;
 
-//     // Filtrar datos por el año seleccionado
-//     const filteredData = data.filter(({ month }: any) => {
-//       const [dataYear] = month.split("-");
-//       return parseInt(dataYear, 10) === year;
-//     });
+//     // Actualizar las gráficas existentes
+//     actualizarVentasMensuales(purchasesByMonth);
+//     actualizarVentasPorProducto(purchasesByMonth);
 
-//     actualizarVentasMensuales(filteredData);
-//     actualizarVentasPorProducto(filteredData);
+//     // Actualizar comparación de meses
+//     const filteredComparison = comparisonData.filter((data: any) => data.year === year);
+//     setMesesComparacion(filteredComparison);
 //   };
 
 //   const actualizarVentasMensuales = (purchasesByMonth: any[]) => {
@@ -106,6 +107,36 @@
 //     setVentasPorProducto(nuevasVentasPorProducto);
 //   };
 
+//   // Datos para la nueva gráfica
+//   const comparisonData = {
+//     labels: mesesComparacion.map((data: any) => data.year.toString()),
+//     datasets: [
+//       {
+//         label: "Mes Más Vendido",
+//         data: mesesComparacion.map((data: any) => data.maxSalesAmount),
+//         backgroundColor: "rgba(75, 192, 192, 0.7)",
+//       },
+//       {
+//         label: "Mes Menos Vendido",
+//         data: mesesComparacion.map((data: any) => data.minSalesAmount),
+//         backgroundColor: "rgba(255, 99, 132, 0.7)",
+//       },
+//     ],
+//   };
+
+//   const comparisonOptions = {
+//     responsive: true,
+//     plugins: {
+//       legend: {
+//         position: "top" as const,
+//       },
+//       title: {
+//         display: true,
+//         text: `Comparación de Ventas del Año ${selectedYear}`,
+//       },
+//     },
+//   };
+
 //   const barData = {
 //     labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
 //     datasets: [
@@ -129,20 +160,22 @@
 
 //   return (
 //     <section className="grid grid-cols-1 gap-6">
+//       {/* Filtro de Año */}
 //       <div className="flex justify-end mb-4">
 //         <select
 //           className="border border-gray-300 p-2 rounded-md"
 //           value={selectedYear}
 //           onChange={(e) => setSelectedYear(parseInt(e.target.value, 10))}
 //         >
-//           {/* Opciones de años dinámicas */}
-//           {[...new Set(allData.map(({ month }: any) => month.split("-")[0]))].map((year: string) => (
+//           {[...new Set(allData.map((data: any) => data.year))].map((year: number) => (
 //             <option key={year} value={year}>
 //               {year}
 //             </option>
 //           ))}
 //         </select>
 //       </div>
+
+//       {/* Gráficas Existentes */}
 //       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 //         <div className="bg-white p-4 rounded-lg shadow-md w-full h-96">
 //           <h2 className="text-lg font-semibold mb-4">Resumen de Ventas (Total por Mes)</h2>
@@ -152,6 +185,12 @@
 //           <h2 className="text-lg font-semibold mb-4">Ventas por Producto</h2>
 //           <Pie data={pieData} options={{ maintainAspectRatio: false }} />
 //         </div>
+//       </div>
+
+//       {/* Nueva Gráfica: Comparación de Meses */}
+//       <div className="bg-white p-4 rounded-lg shadow-md w-full h-96">
+//         <h2 className="text-lg font-semibold mb-4">Mes Más Vendido vs. Menos Vendido</h2>
+//         <Bar data={comparisonData} options={comparisonOptions} />
 //       </div>
 //     </section>
 //   );
@@ -181,10 +220,10 @@ const Charts = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // Año seleccionado
   const [selectedMonth, setSelectedMonth] = useState<string | "All">("All"); // Mes seleccionado para Pie Chart
   const [allData, setAllData] = useState<any[]>([]); // Almacenar todos los datos
+  const [salesComparison, setSalesComparison] = useState<any[]>([]); // Datos para la nueva gráfica de comparación
 
   // Conexión a SignalR y Solicitud de Datos Iniciales
   useEffect(() => {
-    // Configuración de la conexión a SignalR
     const connection = new signalR.HubConnectionBuilder()
       .withUrl("https://localhost:7062/statisticsHub", {
         skipNegotiation: true,
@@ -199,8 +238,9 @@ const Charts = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log("Datos iniciales recibidos:", data);
-        setAllData(data.purchasesByMonth); // Guardar todos los datos
-        actualizarDatosGraficas(data.purchasesByMonth, selectedYear, selectedMonth);
+        setAllData(data.purchasesByMonth || []); // Guardar los datos de ventas mensuales
+        setSalesComparison(data.salesStatisticsByYear || []); // Guardar los datos de comparación de ventas por año
+        actualizarDatosGraficas(data.purchasesByMonth, data.salesStatisticsByYear, selectedYear, selectedMonth);
       })
       .catch((error) => console.error("Error al cargar datos iniciales:", error));
 
@@ -213,8 +253,9 @@ const Charts = () => {
         // Escuchar eventos en tiempo real
         connection.on("ReceiveStatistics", (statistics: any) => {
           console.log("Datos en tiempo real recibidos:", statistics);
-          setAllData(statistics.purchasesByMonth); // Actualizar todos los datos
-          actualizarDatosGraficas(statistics.purchasesByMonth, selectedYear, selectedMonth);
+          setAllData(statistics.purchasesByMonth || []); // Actualizar los datos de ventas mensuales
+          setSalesComparison(statistics.salesStatisticsByYear || []); // Actualizar la comparación de ventas por año
+          actualizarDatosGraficas(statistics.purchasesByMonth, statistics.salesStatisticsByYear, selectedYear, selectedMonth);
         });
       })
       .catch((error) => {
@@ -228,14 +269,14 @@ const Charts = () => {
 
   // Actualizar los datos cuando se cambia el año o mes
   useEffect(() => {
-    actualizarDatosGraficas(allData, selectedYear, selectedMonth);
-  }, [selectedYear, selectedMonth, allData]);
+    actualizarDatosGraficas(allData, salesComparison, selectedYear, selectedMonth);
+  }, [selectedYear, selectedMonth, allData, salesComparison]);
 
-  const actualizarDatosGraficas = (data: any[], year: number, month: string | "All") => {
-    if (!data) return;
+  const actualizarDatosGraficas = (purchasesByMonth: any[], salesStats: any[], year: number, month: string | "All") => {
+    if (!purchasesByMonth) return;
 
     // Filtrar datos por el año seleccionado
-    const filteredData = data.filter(({ month: monthKey }: any) => {
+    const filteredData = purchasesByMonth.filter(({ month: monthKey }: any) => {
       const [dataYear] = monthKey.split("-");
       return parseInt(dataYear, 10) === year;
     });
@@ -277,6 +318,36 @@ const Charts = () => {
     setVentasPorProducto(nuevasVentasPorProducto);
   };
 
+  // Datos para la nueva gráfica de comparación de meses
+  const comparisonData = {
+    labels: salesComparison.map((data: any) => data.year.toString()),
+    datasets: [
+      {
+        label: "Mes Más Vendido",
+        data: salesComparison.map((data: any) => data.maxSalesMonth.totalAmount),
+        backgroundColor: "rgba(75, 192, 192, 0.7)",
+      },
+      {
+        label: "Mes Menos Vendido",
+        data: salesComparison.map((data: any) => data.minSalesMonth.totalAmount),
+        backgroundColor: "rgba(255, 99, 132, 0.7)",
+      },
+    ],
+  };
+
+  const comparisonOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top" as const,
+      },
+      title: {
+        display: true,
+        text: `Comparación del Mes Más Vendido y Menos Vendido por Año`,
+      },
+    },
+  };
+
   const barData = {
     labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
     datasets: [
@@ -307,7 +378,6 @@ const Charts = () => {
           value={selectedYear}
           onChange={(e) => setSelectedYear(parseInt(e.target.value, 10))}
         >
-          {/* Opciones de años dinámicas */}
           {[...new Set(allData.map(({ month }: any) => month.split("-")[0]))].map((year: string) => (
             <option key={year} value={year}>
               {year}
@@ -316,22 +386,7 @@ const Charts = () => {
         </select>
       </div>
 
-      {/* Filtro de Mes para el Pie Chart */}
-      <div className="flex justify-end mb-4">
-        <select
-          className="border border-gray-300 p-2 rounded-md"
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-        >
-          <option value="All">Todo el Año</option>
-          {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-            <option key={month} value={month}>
-              {new Date(0, month - 1).toLocaleString("es-ES", { month: "long" })}
-            </option>
-          ))}
-        </select>
-      </div>
-
+      {/* Gráficas Existentes */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-4 rounded-lg shadow-md w-full h-96">
           <h2 className="text-lg font-semibold mb-4">Resumen de Ventas (Total por Mes)</h2>
@@ -341,6 +396,12 @@ const Charts = () => {
           <h2 className="text-lg font-semibold mb-4">Ventas por Producto</h2>
           <Pie data={pieData} options={{ maintainAspectRatio: false }} />
         </div>
+      </div>
+
+      {/* Nueva Gráfica: Comparación del Mes Más Vendido y Menos Vendido */}
+      <div className="bg-white p-4 rounded-lg shadow-md w-full h-96">
+        <h2 className="text-lg font-semibold mb-4">Comparación del Mes Más y Menos Vendido</h2>
+        <Bar data={comparisonData} options={comparisonOptions} />
       </div>
     </section>
   );
