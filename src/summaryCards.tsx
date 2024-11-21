@@ -1,47 +1,103 @@
-// import React, { useState } from "react";
-// import { useResumenVentas } from "./Hooks/useResumenVentas";
-// import { useClientesActivos } from "./Hooks/useClientesActivos";
-// import { useVentasPorDia } from "./Hooks/useVentasPorDia";
-// import { TextField } from "@mui/material";
-// import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-// import dayjs, { Dayjs } from "dayjs";
+// import React, { useState, useEffect } from "react";
+// import * as signalR from "@microsoft/signalr";
 
 // const SummaryCards = () => {
-//   const { ventasMesesActuales, mesesTexto } = useResumenVentas();
-//   const { totalClientes } = useClientesActivos();
-//   const { ventasPorDia } = useVentasPorDia();
+//   // Estados para almacenar las métricas
+//   const [totalVentasMesActual, setTotalVentasMesActual] = useState(0); // Ventas del mes actual
+//   const [totalVentasGeneral, setTotalVentasGeneral] = useState(0); // Ventas generales
+//   const [totalCustomersMesActual, setTotalCustomersMesActual] = useState(0); // Total de clientes únicos del mes actual
 
-//   // Estado para la fecha seleccionada
-//   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
-//   const fechaSeleccionada = selectedDate ? selectedDate.format("YYYY-MM-DD") : null;
-//   const ventasDelDia = fechaSeleccionada && ventasPorDia[fechaSeleccionada] ? ventasPorDia[fechaSeleccionada] : 0;
+//   // Solicitar datos iniciales del backend
+//   useEffect(() => {
+//     fetch("https://localhost:7062/api/events") // Cambia la URL al endpoint correcto
+//       .then((response) => response.json())
+//       .then((data) => {
+//         console.log("Datos iniciales recibidos:", data);
+//         actualizarDatosResumen(data);
+//       })
+//       .catch((error) => console.error("Error al cargar datos iniciales:", error));
+//   }, []);
 
+//   // Conexión a SignalR para datos en tiempo real
+//   useEffect(() => {
+//     const connection = new signalR.HubConnectionBuilder()
+//       .withUrl("https://localhost:7062/statisticsHub", {
+//         skipNegotiation: true,
+//         transport: signalR.HttpTransportType.WebSockets,
+//       })
+//       .withAutomaticReconnect()
+//       .configureLogging(signalR.LogLevel.Information)
+//       .build();
+
+//     connection
+//       .start()
+//       .then(() => {
+//         console.log("Conectado a SignalR");
+
+//         // Escuchar eventos de estadísticas en tiempo real
+//         connection.on("ReceiveStatistics", (statistics: any) => {
+//           console.log("Estadísticas recibidas en tiempo real:", statistics);
+//           actualizarDatosResumen(statistics);
+//         });
+//       })
+//       .catch((error) => {
+//         console.error("Error al conectar con SignalR:", error);
+//       });
+
+//     return () => {
+//       connection.stop().catch((error) => console.error("Error al detener la conexión:", error));
+//     };
+//   }, []);
+
+//   // Actualizar las métricas
+//   const actualizarDatosResumen = (statistics: any) => {
+//     if (!statistics || !statistics.purchasesByMonth) return;
+
+//     const mesActual = new Date().toISOString().slice(0, 7); // Formato YYYY-MM
+
+//     // Calcula las métricas
+//     const totalVentasMesActual = calcularVentasMesActual(statistics.purchasesByMonth, mesActual);
+//     const totalVentasGeneral = calcularVentasGenerales(statistics.purchasesByMonth);
+//     const totalCustomersMesActual = calcularCustomersMesActual(statistics.purchasesByMonth, mesActual);
+
+//     // Actualiza los estados
+//     setTotalVentasMesActual(totalVentasMesActual);
+//     setTotalVentasGeneral(totalVentasGeneral);
+//     setTotalCustomersMesActual(totalCustomersMesActual);
+//   };
+
+//   // Calcular el total de ventas del mes actual
+//   const calcularVentasMesActual = (purchasesByMonth: any[], mesActual: string) => {
+//     const mesActualData = purchasesByMonth.find((mes: any) => mes.month === mesActual);
+//     return mesActualData ? mesActualData.totalAmount : 0;
+//   };
+
+//   // Calcular el total de ventas en general
+//   const calcularVentasGenerales = (purchasesByMonth: any[]) => {
+//     return purchasesByMonth.reduce((total: number, mes: any) => total + mes.totalAmount, 0);
+//   };
+
+//   // Calcular el total de clientes únicos del mes actual
+//   const calcularCustomersMesActual = (purchasesByMonth: any[], mesActual: string) => {
+//     const mesActualData = purchasesByMonth.find((mes: any) => mes.month === mesActual);
+//     return mesActualData ? mesActualData.totalCustomers : 0;
+//   };
+
+//   // Configuración de las tarjetas
 //   const cards = [
+//       {
+//         title: "Ventas Generales",
+//         value: `${totalVentasGeneral.toLocaleString("es-ES")}`,
+//         change: "",
+//       },
 //     {
-//       title: `Ventas (${mesesTexto})`,
-//       value: `${ventasMesesActuales.toLocaleString("es-ES")}`,
+//       title: "Ventas del Mes Actual",
+//       value: `${totalVentasMesActual.toLocaleString("es-ES")}`,
 //       change: "",
 //     },
 //     {
-//       title: "Ventas Por día",
-//       value: `${ventasDelDia.toLocaleString("es-ES")}`,
-//       change: (
-//         <LocalizationProvider dateAdapter={AdapterDayjs}>
-//           <DatePicker
-//             label="Selecciona una fecha"
-//             value={selectedDate}
-//             onChange={(newDate) => setSelectedDate(newDate)}
-//             slotProps={{
-//               textField: { fullWidth: true, size: "small" },
-//             }}
-//           />
-//         </LocalizationProvider>
-//       ),
-//     },
-//     {
-//       title: "Clientes Activos",
-//       value: `${totalClientes}`,
+//       title: "Clientes Únicos del Mes Actual",
+//       value: `${totalCustomersMesActual}`,
 //       change: "",
 //     },
 //   ];
@@ -62,24 +118,28 @@
 // export default SummaryCards;
 
 import React, { useState, useEffect } from "react";
-import { TextField } from "@mui/material";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { Dayjs } from "dayjs";
 import * as signalR from "@microsoft/signalr";
 
 const SummaryCards = () => {
-  // Estado para almacenar los datos de SignalR
-  const [ventasPorMes, setVentasPorMes] = useState(0); // Total de ventas del mes actual
-  const [ventasPorDia, setVentasPorDia] = useState<{ [key: string]: number }>({}); // Ventas agrupadas por día
-  const [clientesActivos, setClientesActivos] = useState(0); // Total de clientes activos
+  // Estados para almacenar las métricas
+  const [totalVentasMesActual, setTotalVentasMesActual] = useState(0); // Ventas del mes actual
+  const [totalVentasGeneral, setTotalVentasGeneral] = useState(0); // Ventas generales
+  const [totalCustomersMesActual, setTotalCustomersMesActual] = useState(0); // Clientes únicos del mes actual
+  const [totalProductsMesActual, setTotalProductsMesActual] = useState(0); // Productos del mes actual
+  const [totalPurchasesMesActual, setTotalPurchasesMesActual] = useState(0); // Compras del mes actual
 
-  // Estado para la fecha seleccionada
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
-  const fechaSeleccionada = selectedDate ? selectedDate.format("YYYY-MM-DD") : null;
-  const ventasDelDia = fechaSeleccionada && ventasPorDia[fechaSeleccionada] ? ventasPorDia[fechaSeleccionada] : 0;
+  // Solicitar datos iniciales del backend
+  useEffect(() => {
+    fetch("https://localhost:7062/api/events") // Cambia la URL al endpoint correcto
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Datos iniciales recibidos:", data);
+        actualizarDatosResumen(data);
+      })
+      .catch((error) => console.error("Error al cargar datos iniciales:", error));
+  }, []);
 
-  // Conexión a SignalR
+  // Conexión a SignalR para datos en tiempo real
   useEffect(() => {
     const connection = new signalR.HubConnectionBuilder()
       .withUrl("https://localhost:7062/statisticsHub", {
@@ -97,7 +157,7 @@ const SummaryCards = () => {
 
         // Escuchar eventos de estadísticas en tiempo real
         connection.on("ReceiveStatistics", (statistics: any) => {
-          console.log("Estadísticas recibidas:", statistics);
+          console.log("Estadísticas recibidas en tiempo real:", statistics);
           actualizarDatosResumen(statistics);
         });
       })
@@ -110,79 +170,81 @@ const SummaryCards = () => {
     };
   }, []);
 
-  // Actualizar el estado con las estadísticas recibidas
+  // Actualizar las métricas
   const actualizarDatosResumen = (statistics: any) => {
     if (!statistics || !statistics.purchasesByMonth) return;
 
-    const ventasPorMesActual = calcularVentasMesActual(statistics.purchasesByMonth);
-    const ventasPorDiaAgrupadas = calcularVentasPorDia(statistics.purchasesByMonth);
-    const totalClientesActivos = calcularClientesActivos(statistics.purchasesByMonth);
+    const mesActual = new Date().toISOString().slice(0, 7); // Formato YYYY-MM
 
-    setVentasPorMes(ventasPorMesActual);
-    setVentasPorDia(ventasPorDiaAgrupadas);
-    setClientesActivos(totalClientesActivos);
+    // Calcula las métricas
+    const totalVentasMesActual = calcularVentasMesActual(statistics.purchasesByMonth, mesActual);
+    const totalVentasGeneral = calcularVentasGenerales(statistics.purchasesByMonth);
+    const totalCustomersMesActual = calcularCustomersMesActual(statistics.purchasesByMonth, mesActual);
+    const totalProductsMesActual = calcularProductsMesActual(statistics.purchasesByMonth, mesActual);
+    const totalPurchasesMesActual = calcularPurchasesMesActual(statistics.purchasesByMonth, mesActual);
+
+    // Actualiza los estados
+    setTotalVentasMesActual(totalVentasMesActual);
+    setTotalVentasGeneral(totalVentasGeneral);
+    setTotalCustomersMesActual(totalCustomersMesActual);
+    setTotalProductsMesActual(totalProductsMesActual);
+    setTotalPurchasesMesActual(totalPurchasesMesActual);
   };
 
-  // Función para calcular las ventas del mes actual
-  const calcularVentasMesActual = (purchasesByMonth: any[]) => {
-    const mesActual = dayjs().format("YYYY-MM");
+  // Calcular el total de ventas del mes actual
+  const calcularVentasMesActual = (purchasesByMonth: any[], mesActual: string) => {
     const mesActualData = purchasesByMonth.find((mes: any) => mes.month === mesActual);
     return mesActualData ? mesActualData.totalAmount : 0;
   };
 
-  // Función para agrupar las ventas por día
-  const calcularVentasPorDia = (purchasesByMonth: any[]) => {
-    const ventasPorDia: { [key: string]: number } = {};
-
-    purchasesByMonth.forEach((mes: any) => {
-      mes.products.forEach((producto: any) => {
-        const fecha = dayjs(mes.month).format("YYYY-MM-DD");
-        ventasPorDia[fecha] = (ventasPorDia[fecha] || 0) + producto.price;
-      });
-    });
-
-    return ventasPorDia;
+  // Calcular el total de ventas en general
+  const calcularVentasGenerales = (purchasesByMonth: any[]) => {
+    return purchasesByMonth.reduce((total: number, mes: any) => total + mes.totalAmount, 0);
   };
 
-  // Función para calcular el total de clientes activos
-  const calcularClientesActivos = (purchasesByMonth: any[]) => {
-    const clientesUnicos = new Set<string>();
-
-    purchasesByMonth.forEach((mes: any) => {
-      mes.products.forEach((producto: any) => {
-        clientesUnicos.add(producto.customerId);
-      });
-    });
-
-    return clientesUnicos.size;
+  // Calcular el total de clientes únicos del mes actual
+  const calcularCustomersMesActual = (purchasesByMonth: any[], mesActual: string) => {
+    const mesActualData = purchasesByMonth.find((mes: any) => mes.month === mesActual);
+    return mesActualData ? mesActualData.totalCustomers : 0;
   };
 
-  // Definición de las tarjetas de resumen
+  // Calcular el total de productos del mes actual
+  const calcularProductsMesActual = (purchasesByMonth: any[], mesActual: string) => {
+    const mesActualData = purchasesByMonth.find((mes: any) => mes.month === mesActual);
+    return mesActualData ? mesActualData.totalProducts : 0;
+  };
+
+  // Calcular el total de compras del mes actual
+  const calcularPurchasesMesActual = (purchasesByMonth: any[], mesActual: string) => {
+    const mesActualData = purchasesByMonth.find((mes: any) => mes.month === mesActual);
+    return mesActualData ? mesActualData.totalPurchases : 0;
+  };
+
+  // Configuración de las tarjetas
   const cards = [
     {
-      title: `Ventas (Mes Actual)`,
-      value: `${ventasPorMes.toLocaleString("es-ES")}`,
+      title: "Ventas Generales",
+      value: `${totalVentasGeneral.toLocaleString("es-ES")}`,
       change: "",
     },
-    // {
-    //   title: "Ventas Por día",
-    //   value: `${ventasDelDia.toLocaleString("es-ES")}`,
-    //   change: (
-    //     <LocalizationProvider dateAdapter={AdapterDayjs}>
-    //       <DatePicker
-    //         label="Selecciona una fecha"
-    //         value={selectedDate}
-    //         onChange={(newDate) => setSelectedDate(newDate)}
-    //         slotProps={{
-    //           textField: { fullWidth: true, size: "small" },
-    //         }}
-    //       />
-    //     </LocalizationProvider>
-    //   ),
-    // },
     {
-      title: "Clientes Activos",
-      value: `${clientesActivos}`,
+      title: "Ventas del Mes Actual",
+      value: `${totalVentasMesActual.toLocaleString("es-ES")}`,
+      change: "",
+    },
+    {
+      title: "Clientes Únicos del Mes Actual",
+      value: `${totalCustomersMesActual}`,
+      change: "",
+    },
+    {
+      title: "Productos del Mes Actual",
+      value: `${totalProductsMesActual}`,
+      change: "",
+    },
+    {
+      title: "Compras del Mes Actual",
+      value: `${totalPurchasesMesActual}`,
       change: "",
     },
   ];
