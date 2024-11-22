@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-import { useVentasPorDia } from "./Hooks/useVentasPorDia";
-import { TextField } from "@mui/material";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
+import { useState } from "react";
+import { useVentasPorDia } from "../Hooks/useVentasPorDia";
 
 const VentasPorDia = () => {
   const { ventasPorDia } = useVentasPorDia();

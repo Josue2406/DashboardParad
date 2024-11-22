@@ -1,6 +1,5 @@
-import { FaTachometerAlt, FaBoxOpen, FaUsers, FaChartLine } from 'react-icons/fa';
-import { NavLink } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { FaChartLine, FaTachometerAlt } from 'react-icons/fa';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 const Sidebar = () => {
 
@@ -62,7 +61,7 @@ const Sidebar = () => {
                         <span>Productos</span>
                     </NavLink> */}
                     <NavLink
-                        to="/event-viewer"
+                        to="/dashboard/event-viewer"
                         className={({ isActive }) =>
                             `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
                                 isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
@@ -71,6 +70,40 @@ const Sidebar = () => {
                     >
                         <FaTachometerAlt />
                         <span>Eventos</span>
+                    </NavLink>
+
+                    <NavLink
+                        to="/dashboard/dashboard-tr"
+                        className={({ isActive }) =>
+                            `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
+                                isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
+                            }`
+                        }
+                    >
+                        <FaTachometerAlt />
+                        <span>Mayores Compras</span>
+                    </NavLink>
+                    <NavLink
+                        to="/dashboard/customer-si"
+                        className={({ isActive }) =>
+                            `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
+                                isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
+                            }`
+                        }
+                    >
+                        <FaTachometerAlt />
+                        <span>Mejores Clientes</span>
+                    </NavLink>
+                    <NavLink
+                        to="/dashboard/baratos-vendidos"
+                        className={({ isActive }) =>
+                            `flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-green-100 ${
+                                isActive ? 'text-green-700 font-semibold' : 'text-gray-600'
+                            }`
+                        }
+                    >
+                        <FaTachometerAlt />
+                        <span>Productos baratos y menos vendidos</span>
                     </NavLink>
 
                 </nav>

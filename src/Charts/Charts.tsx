@@ -198,19 +198,19 @@
 
 // export default Charts;
 
-import { useEffect, useState } from "react";
+import * as signalR from "@microsoft/signalr";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
+  ArcElement,
   BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
   Title,
   Tooltip,
-  Legend,
-  ArcElement,
 } from "chart.js";
+import { useEffect, useState } from "react";
 import { Bar, Pie } from "react-chartjs-2";
-import * as signalR from "@microsoft/signalr";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -323,7 +323,7 @@ const Charts = () => {
     labels: salesComparison.map((data: any) => data.year.toString()),
     datasets: [
       {
-        label: "Mes Más Vendido",
+        label: "Mes mas vendido",
         data: salesComparison.map((data: any) => data.maxSalesMonth.totalAmount),
         backgroundColor: "rgba(75, 192, 192, 0.7)",
       },
@@ -343,7 +343,7 @@ const Charts = () => {
       },
       title: {
         display: true,
-        text: `Comparación del Mes Más Vendido y Menos Vendido por Año`,
+        text: `Ventas por provincias`,
       },
     },
   };
@@ -371,7 +371,7 @@ const Charts = () => {
 
   return (
     <section className="grid grid-cols-1 gap-6">
-      {/* Filtro de Año */}
+      {/* Filtro de Año 
       <div className="flex justify-end mb-4">
         <select
           className="border border-gray-300 p-2 rounded-md"
@@ -384,7 +384,7 @@ const Charts = () => {
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
 
       {/* Gráficas Existentes */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -398,11 +398,7 @@ const Charts = () => {
         </div>
       </div>
 
-      {/* Nueva Gráfica: Comparación del Mes Más Vendido y Menos Vendido */}
-      <div className="bg-white p-4 rounded-lg shadow-md w-full h-96">
-        <h2 className="text-lg font-semibold mb-4">Comparación del Mes Más y Menos Vendido</h2>
-        <Bar data={comparisonData} options={comparisonOptions} />
-      </div>
+  
     </section>
   );
 };

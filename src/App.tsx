@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./Login";
-import Dashboard from "./Dashboard";
-import EventViewer from "./EventView";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import Login from "./Auth/Login";
+import DashboardTR from "./Charts/DashboardTR";
+import EventViewer from "./events/EventView";
+import Dashboard from "./principal/Dashboard";
  // Importa EventViewer
 
 function App() {
@@ -21,6 +22,10 @@ function App() {
 
           {/* Ruta para EventViewer */}
           <Route path="/event-viewer" element={<EventViewer />} />
+
+          <Route path="/dashboard-tr" element={<DashboardTR />} />
+
+
 
         </Routes>
       </div>

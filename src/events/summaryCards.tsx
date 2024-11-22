@@ -117,13 +117,13 @@
 
 // export default SummaryCards;
 
-import React, { useState, useEffect } from "react";
 import * as signalR from "@microsoft/signalr";
+import { useEffect, useState } from "react";
 
 const SummaryCards = () => {
   // Estados para almacenar las métricas
   const [totalVentasMesActual, setTotalVentasMesActual] = useState(0); // Ventas del mes actual
-  const [totalVentasGeneral, setTotalVentasGeneral] = useState(0); // Ventas generales
+  //const [totalVentasGeneral, setTotalVentasGeneral] = useState(0); // Ventas generales
   const [totalCustomersMesActual, setTotalCustomersMesActual] = useState(0); // Clientes únicos del mes actual
   const [totalProductsMesActual, setTotalProductsMesActual] = useState(0); // Productos del mes actual
   const [totalPurchasesMesActual, setTotalPurchasesMesActual] = useState(0); // Compras del mes actual
@@ -178,14 +178,14 @@ const SummaryCards = () => {
 
     // Calcula las métricas
     const totalVentasMesActual = calcularVentasMesActual(statistics.purchasesByMonth, mesActual);
-    const totalVentasGeneral = calcularVentasGenerales(statistics.purchasesByMonth);
+    //const totalVentasGeneral = calcularVentasGenerales(statistics.purchasesByMonth);
     const totalCustomersMesActual = calcularCustomersMesActual(statistics.purchasesByMonth, mesActual);
     const totalProductsMesActual = calcularProductsMesActual(statistics.purchasesByMonth, mesActual);
     const totalPurchasesMesActual = calcularPurchasesMesActual(statistics.purchasesByMonth, mesActual);
 
     // Actualiza los estados
     setTotalVentasMesActual(totalVentasMesActual);
-    setTotalVentasGeneral(totalVentasGeneral);
+    //setTotalVentasGeneral(totalVentasGeneral);
     setTotalCustomersMesActual(totalCustomersMesActual);
     setTotalProductsMesActual(totalProductsMesActual);
     setTotalPurchasesMesActual(totalPurchasesMesActual);
@@ -198,9 +198,9 @@ const SummaryCards = () => {
   };
 
   // Calcular el total de ventas en general
-  const calcularVentasGenerales = (purchasesByMonth: any[]) => {
+ /* const calcularVentasGenerales = (purchasesByMonth: any[]) => {
     return purchasesByMonth.reduce((total: number, mes: any) => total + mes.totalAmount, 0);
-  };
+  };*/
 
   // Calcular el total de clientes únicos del mes actual
   const calcularCustomersMesActual = (purchasesByMonth: any[], mesActual: string) => {
@@ -222,11 +222,11 @@ const SummaryCards = () => {
 
   // Configuración de las tarjetas
   const cards = [
-    {
+    /*{
       title: "Ventas Generales",
       value: `${totalVentasGeneral.toLocaleString("es-ES")}`,
       change: "",
-    },
+    },*/
     {
       title: "Ventas del Mes Actual",
       value: `${totalVentasMesActual.toLocaleString("es-ES")}`,
@@ -238,7 +238,7 @@ const SummaryCards = () => {
       change: "",
     },
     {
-      title: "Productos del Mes Actual",
+      title: "Productos comprados del Mes Actual",
       value: `${totalProductsMesActual}`,
       change: "",
     },

@@ -1,12 +1,16 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Charts from './Charts';
+import { Route, Routes } from 'react-router-dom';
+import Charts from '../Charts/Charts';
 // import DynamicChart from './DynamicChart';
 // import SummaryCards from './summaryCards';
-import Sidebar from './sidebar';
+import DashboardTR from "../Charts/DashboardTR";
+import ProductCharts from '../Charts/ProductCharts';
+import TopCustomersChart from '../Charts/TopCustomersChart';
+import EventViewer from '../events/EventView';
+import SummaryCards from '../events/summaryCards';
 import Header from './Header';
-import EventViewer from './EventView';
-import SummaryCards from './summaryCards';
+import Sidebar from './sidebar';
+
 
 interface DashboardProps {
     token: string | null;
@@ -34,9 +38,12 @@ const Dashboard: React.FC<DashboardProps> = ({ token }) => {
                         
                         {/* Ruta para mostrar solo las gráficas */}
                         <Route path="graficas" element={<Charts />} />
+                         {/* Ruta para el DashboardTR */}
+                        <Route path="dashboard-tr" element={<DashboardTR />} />
                         
-                        {/* Ruta para mostrar solo las tarjetas de resumen de clientes
-                        <Route path="clientes" element={<SummaryCards />} /> */}
+                        <Route path="customer-si" element={<TopCustomersChart/>} />
+
+                        <Route path="baratos-vendidos" element={<ProductCharts />} />
                         
                         {/* Ruta para mostrar solo productos */}
                         <Route path="productos" element={<div>Productos agregados</div>} />

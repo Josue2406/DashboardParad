@@ -16,7 +16,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         setErrorMessage(null);
     
         try {
-            const response = await fetch('http://localhost:7062/WeatherForecast/request-token', {
+            const response = await fetch('https://localhost:7062/WeatherForecast/request-token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
