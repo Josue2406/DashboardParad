@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
+import React, { useEffect, useState } from 'react';
 
 interface ProductSales {
   productId: number;
@@ -8,7 +8,7 @@ interface ProductSales {
 }
 
 const SignalRDataDisplay: React.FC = () => {
-  const [productSales, setProductSales] = useState<ProductSales[]>([]);
+  const [productSales] = useState<ProductSales[]>([]);
 
   useEffect(() => {
     // const connection = new signalR.HubConnectionBuilder()

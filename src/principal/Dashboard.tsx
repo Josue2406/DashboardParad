@@ -16,7 +16,7 @@ interface DashboardProps {
     token: string | null;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ token }) => {
+const Dashboard: React.FC<DashboardProps> = () => {
     return (
         <div className="flex h-screen overflow-hidden">
             {/* Sidebar fijo en el lado izquierdo */}
